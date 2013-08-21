@@ -5,6 +5,7 @@ namespace Acme\DemoBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Acme\DemoBundle\Form\ContactType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -19,6 +20,95 @@ class DemoController extends Controller
     public function indexAction()
     {
         return array();
+    }
+
+    /**
+     * @Route("/objectchoicelist", name="_demo_objectchoicelist")
+     * @Template()
+     */
+    public function objectChoiceListAction()
+    {
+    	$foo = new \StdClass();
+    	$foo->id = 11;
+    	$foo->name = 'Foo';
+
+    	$bar = new \StdClass();
+    	$bar->id = 12;
+    	$bar->name = 'Bar';
+
+    	$baz = new \StdClass();
+    	$baz->id = 13;
+    	$baz->name = 'Baz';
+    	
+    	$another_bar = new \StdClass();
+    	$another_bar->id = 12;
+    	$another_bar->name = 'Bar';
+    	
+    	$choices = array( $foo, $bar, $baz );
+
+		$choice_list = new ObjectChoiceList(
+			$choices,
+			'name',   # label path
+			array(),  # preferred choices
+			null,     # group path
+			'id'      # value path
+		);
+    	
+    	$data = array(
+    		'same_instance' => $bar,
+    		'same_instance_expanded' => $bar,
+    		'same_instance_multiple' => array( $bar ),
+    		'same_instance_multiple_expanded' => array( $bar ),
+    		'other_instance' => $another_bar,
+    		'other_instance_expanded' => $another_bar,
+    		'other_instance_multiple' => array( $another_bar ),
+    		'other_instance_multiple_expanded' => array( $another_bar ),
+    	);
+    	
+    	$form = $this->createFormBuilder( $data )
+    		->add( 'same_instance', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---'
+    		) )
+    		->add( 'same_instance_expanded', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---',
+    			'expanded' => true
+    		) )
+    		->add( 'same_instance_multiple', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---',
+    			'multiple' => true
+    		) )
+    		->add( 'same_instance_multiple_expanded', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---',
+    			'multiple' => true,
+    			'expanded' => true
+    		) )
+    		->add( 'other_instance', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---'
+    		) )
+    		->add( 'other_instance_expanded', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---',
+    			'expanded' => true
+    		) )
+    		->add( 'other_instance_multiple', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---',
+    			'multiple' => true
+    		) )
+    		->add( 'other_instance_multiple_expanded', 'choice', array(
+    			'choice_list' => $choice_list,
+    			'empty_value' => '---',
+    			'multiple' => true,
+    			'expanded' => true
+    		) )
+    		->getForm();
+
+        return array('form' => $form->createView());
     }
 
     /**
